@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ducaten Bank</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #d9534f; /* Rode achtergrondkleur */
+            color: #000; /* Zwarte tekst voor betere leesbaarheid op rode achtergrond */
+            text-align: center;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .container {
+            width: 40%;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 8px 0px #d9534f;
+        }
+
+        h1 {
+            color: #000; /* Zwarte tekst voor betere leesbaarheid op rode achtergrond */
+        }
+
+        hr {
+            border-color: #000; /* Zwarte lijn voor betere zichtbaarheid op rode achtergrond */
+        }
+
+        label {
+            font-size: 16px;
+            color: #000; /* Zwarte tekst voor betere leesbaarheid op rode achtergrond */
+        }
+
+        input, button {
+            padding: 8px;
+            margin: 4px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #fff; /* Witte knoppen voor betere zichtbaarheid op rode achtergrond */
+            color: #d9534f; /* Rode tekst voor betere leesbaarheid op witte knoppen */
+            cursor: pointer;
+        }
+
+        .account, .team {
+            background-color: #fff;
+            margin: 8px;
+            border-radius: 12px;
+            box-shadow: 0px 0px 8px 0px #d9534f;
+        }
+
+        .ducatCount {
+            font-size: 20px;
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Individuele Accounts</h1>
+
+        <!-- Voeg namen toe -->
+        <label for="addName">Voeg een nieuwe naam toe:</label>
+        <input type="text" id="addName" placeholder="Naam">
+        <button onclick="addNewAccount()">Toevoegen</button>
+
+        <hr>
+
+        <!-- Groot vak om aan iedereen ducaten toe te voegen -->
+        <label for="totalDucats">Voeg ducaten toe aan iedereen:</label>
+        <input type="number" id="totalDucats" placeholder="Aantal ducaten">
+        <button onclick="addToEveryone()">Toevoegen</button>
+
+        <hr>
+
+        <!-- Individuele namen met hun ducaten -->
+        <div id="accounts">
+            <!-- Voeg meer van deze blokken toe voor extra namen -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Team Accounts</h1>
+
+        <!-- Voeg teamnamen toe -->
+        <label for="addTeam">Voeg een nieuw team toe:</label>
+        <input type="text" id="addTeam" placeholder="Team Naam">
+        <button onclick="addNewTeam()">Toevoegen</button>
+
+        <hr>
+
+        <!-- Groot vak om aan elk team ducaten toe te voegen -->
+        <label for="totalTeamDucats">Voeg ducaten toe aan elk team:</label>
+        <input type="number" id="totalTeamDucats" placeholder="Aantal ducaten">
+        <button onclick="addToEveryTeam()">Toevoegen</button>
+
+        <hr>
+
+        <!-- Teamnamen met hun totaal aantal ducaten -->
+        <div id="teams">
+            <!-- Voeg meer van deze blokken toe voor extra teams -->
+        </div>
+    </div>
+
+    <button onclick="clearAllData()">Wis Alle Scores</button>
+
+    <script>
+        // ... (bestaande functies) ...
+
+        function clearAllData() {
+            // Vraag de gebruiker om bevestiging
+            var confirmation = confirm("Weet je zeker dat je alle scores wilt wissen? Dit kan niet ongedaan worden gemaakt.");
+
+            if (confirmation) {
+                // Wis alle gegevens en herlaad de pagina
+                localStorage.removeItem('accountsData');
+                localStorage.removeItem('teamsData');
+                location.reload();
+            }
+        }
+    </script>
+
+    <script>
+        // ... (bestaande functies) ...
+
+        // Functie om gegevens op te slaan
+        function saveData() {
+            var accountsData = document.getElementById('accounts').innerHTML;
+            var teamsData = document.getElementById('teams').innerHTML;
+
+            localStorage.setItem('accountsData', accountsData);
+            localStorage.setItem('teamsData', teamsData);
+        }
+
+        // Functie om gegevens te laden
+        function loadData() {
+            var accountsData = localStorage.getItem('accountsData');
+            var teamsData = localStorage.getItem('teamsData');
+
+            if (accountsData) {
+                document.getElementById('accounts').innerHTML = accountsData;
+            }
+
+            if (teamsData) {
+                document.getElementById('teams').innerHTML = teamsData;
+            }
+        }
+
+        // Laad opgeslagen gegevens bij het laden van de pagina
+        window.onload = loadData;
+
+        function addNewAccount() {
+            var addNameInput = document.getElementById('addName');
+            var newName = addNameInput.value.trim();
+
+            if (newName !== '') {
+                // Maak een nieuw accountblok aan
+                var accountsDiv = document.getElementById('accounts');
+                var newAccountDiv = document.createElement('div');
+                var accountId = 'account' + (accountsDiv.childElementCount + 1);
+                newAccountDiv.setAttribute('class', 'account');
+                newAccountDiv.setAttribute('id', accountId);
+
+                // Voeg HTML-inhoud toe aan het accountblok
+                newAccountDiv.innerHTML = `
+                    <h2>${newName}</h2>
+                    <p>Huidig aantal ducaten: <span class="ducatCount" id="ducatCount${accountsDiv.childElementCount + 1}">0</span></p>
+                    <label for="addDucats${accountsDiv.childElementCount + 1}">Voeg ducaten toe:</label>
+                    <input type="number" class="addDucatsInput" placeholder="Aantal ducaten">
+                    <button onclick="addToAccount(${accountsDiv.childElementCount + 1})">Toevoegen</button>
+                `;
+
+                // Voeg het nieuwe accountblok toe aan de DOM
+                accountsDiv.appendChild(newAccountDiv);
+
+                // Wis het invoerveld
+                addNameInput.value = '';
+
+                // Sla gegevens op na het toevoegen van een nieuw account
+                saveData();
+            }
+        }
+
+        function addToEveryone() {
+            var totalDucatsInput = document.getElementById('totalDucats');
+            var totalDucatsValue = parseInt(totalDucatsInput.value) || 0;
+
+            // Voeg het totale aantal ducaten toe aan iedereen
+            var ducatCountElements = document.querySelectorAll('.ducatCount');
+            ducatCountElements.forEach(function (ducatCountElement) {
+                var currentDucatCount = parseInt(ducatCountElement.innerText) || 0;
+                ducatCountElement.innerText = currentDucatCount + totalDucatsValue;
+            });
+
+            // Wis het invoerveld
+            totalDucatsInput.value = '';
+
+            // Sla gegevens op na het toevoegen van ducaten aan iedereen
+            saveData();
+        }
+
+        function addToAccount(accountNumber) {
+            var addDucatsInput = document.querySelector(`#account${accountNumber} .addDucatsInput`);
+            var ducatsToAdd = parseInt(addDucatsInput.value) || 0;
+
+            // Voeg het opgegeven aantal ducaten toe aan de specifieke account
+            var ducatCountElement = document.getElementById(`ducatCount${accountNumber}`);
+            var currentDucatCount = parseInt(ducatCountElement.innerText) || 0;
+            ducatCountElement.innerText = currentDucatCount + ducatsToAdd;
+
+            // Wis het invoerveld
+            addDucatsInput.value = '';
+
+            // Sla gegevens op na het toevoegen van ducaten aan een account
+            saveData();
+        }
+
+        function addNewTeam() {
+            var addTeamInput = document.getElementById('addTeam');
+            var newTeamName = addTeamInput.value.trim();
+
+            if (newTeamName !== '') {
+                // Maak een nieuw teamblok aan
+                var teamsDiv = document.getElementById('teams');
+                var newTeamDiv = document.createElement('div');
+                var teamId = 'team' + (teamsDiv.childElementCount + 1);
+                newTeamDiv.setAttribute('class', 'team');
+                newTeamDiv.setAttribute('id', teamId);
+
+                // Voeg HTML-inhoud toe aan het teamblok
+                newTeamDiv.innerHTML = `
+                    <h2>${newTeamName}</h2>
+                    <p>Totaal aantal ducaten: <span class="ducatCount" id="teamDucatCount${teamsDiv.childElementCount + 1}">0</span></p>
+                    <label for="addTeamDucats${teamsDiv.childElementCount + 1}">Voeg ducaten toe:</label>
+                    <input type="number" class="addDucatsInput" placeholder="Aantal ducaten">
+                    <button onclick="addToTeam(${teamsDiv.childElementCount + 1})">Toevoegen</button>
+                `;
+
+                // Voeg het nieuwe teamblok toe aan de DOM
+                teamsDiv.appendChild(newTeamDiv);
+
+                // Wis het invoerveld
+                addTeamInput.value = '';
+
+                // Sla gegevens op na het toevoegen van een nieuw team
+                saveData();
+            }
+        }
+
+        function addToEveryTeam() {
+            var totalTeamDucatsInput = document.getElementById('totalTeamDucats');
+            var totalTeamDucatsValue = parseInt(totalTeamDucatsInput.value) || 0;
+
+            // Voeg het totale aantal ducaten toe aan elk team
+            var teamDucatCountElements = document.querySelectorAll('.team .ducatCount');
+            teamDucatCountElements.forEach(function (teamDucatCountElement) {
+                var currentTeamDucatCount = parseInt(teamDucatCountElement.innerText) || 0;
+                teamDucatCountElement.innerText = currentTeamDucatCount + totalTeamDucatsValue;
+            });
+
+            // Wis het invoerveld
+            totalTeamDucatsInput.value = '';
+
+            // Sla gegevens op na het toevoegen van ducaten aan elk team
+            saveData();
+        }
+
+        function addToTeam(teamNumber) {
+            var addDucatsInput = document.querySelector(`#team${teamNumber} .addDucatsInput`);
+            var ducatsToAdd = parseInt(addDucatsInput.value) || 0;
+
+            // Voeg het opgegeven aantal ducaten toe aan het specifieke team
+            var teamDucatCountElement = document.getElementById(`teamDucatCount${teamNumber}`);
+            var currentTeamDucatCount = parseInt(teamDucatCountElement.innerText) || 0;
+            teamDucatCountElement.innerText = currentTeamDucatCount + ducatsToAdd;
+
+            // Wis het invoerveld
+            addDucatsInput.value = '';
+
+            // Sla gegevens op na het toevoegen van ducaten aan een team
+            saveData();
+        }
+    </script>
+
+</body>
+</html>
